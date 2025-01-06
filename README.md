@@ -114,9 +114,9 @@ To further enhance temporal consistency, the Temporal Upsampling Module incorpor
 
 The output embeddings are processed with a residual connection:
 
-\[
+```math
 E_Y = \eta \cdot E_{\text{temp}} + (1 - \eta) \cdot E'_{\text{temp}},
-\]
+```
 
 where $\eta$ is a learnable mixing coefficient, and $E'_{\text{temp}}$ represents the temporally attended embeddings.
 
