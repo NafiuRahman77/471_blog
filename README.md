@@ -74,9 +74,9 @@ The Perception Reconstructor (PR) is a fundamental component of the NeuroClips f
 
 ##### Video Segmentation and Frame Alignment
 
-To handle the temporal resolution of fMRI, the input video is divided into several clips of two-second intervals. For each clip, denoted as $ c $:
+To handle the temporal resolution of fMRI, the input video is divided into several clips of two-second intervals. For each clip, denoted as $c$:
 
-- The video is downsampled, retaining frames at fixed intervals to form a set $X = [X_1, X_2, \ldots, X_{N_f}]$, where $ X_i $ represents the $ i $-th retained frame image, and $ N_f $ is the total number of retained frames.
+- The video is downsampled, retaining frames at fixed intervals to form a set $X = [X_1, X_2, \ldots, X_{N_f}]$, where $X_i$ represents the $i$-th retained frame image, and $ N_f $ is the total number of retained frames.
 - The corresponding fMRI signal $ Y_c $ is extended into $ N_f $ frames using the **Inception Extension Module**, producing $ Y = [Y_1, Y_2, \ldots, Y_{N_f}] $.
 
 ##### Embedding Generation
