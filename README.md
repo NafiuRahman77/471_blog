@@ -123,12 +123,69 @@ where $\eta$ is a learnable mixing coefficient, and $E'_{\text{temp}}$ represent
 
 ### 2. Semantics Reconstructor
 
-The Semantics Reconstructor is tasked with generating high-quality keyframes that capture the essential semantic details of video scenes. It employs advanced mapping techniques to align fMRI embeddings with the image space of CLIP, a pre-trained vision-language model.
+The Semantics Reconstructor (SR) is designed to address the frame rate mismatch between fMRI signals and visual stimuli by reconstructing high-quality keyframe images. These keyframes encapsulate essential semantic information and act as representative features for video clips, thereby enhancing the fidelity of the reconstructed video.
 
-Steps involved:
-- **Dimensionality Reduction:** Simplifies fMRI signals using ridge regression for more effective processing.
-- **Keyframe Alignment:** Maps keyframe embeddings to fMRI data using contrastive learning techniques.
-- **Text Augmentation:** Enriches semantic details by incorporating captions generated from keyframes using BLIP-2, a vision-language model.
+#### Cognitive Basis
+
+Recent studies in cognitive neuroscience highlight the significance of keyframes in human memory recall and event connection. Keyframes serve as anchors that the brain uses to link relevant memories with unfolding events, making them an ideal target for reconstruction from fMRI data. This insight forms the foundation of the SR’s approach.
+
+#### Key Components of the Semantics Reconstructor
+
+##### 1. fMRI Low-Dimensional Processing
+
+To simplify the high-dimensional fMRI data for processing, a ridge regression model is employed:
+
+```math
+Y'_c = X(X^T X + \lambda I)^{-1} X^T Y_c,
+```
+
+where:
+- $Y_c$: Original fMRI signal for clip $c$.
+- $Y'_c$: Low-dimensional fMRI representation.
+- $X$: Design matrix.
+- $\lambda$: Regularization parameter.
+- $I$: Identity matrix.
+
+Although the human brain processes information non-linearly, empirical evidence supports the effectiveness of linear mapping for desirable reconstructions, as nonlinear models are prone to overfitting noise in fMRI data.
+
+##### 2. Alignment of Keyframe Images with fMRI
+
+For each clip $c$, a single frame $X_c$ is randomly selected as the keyframe. The following steps are performed:
+
+- The keyframe $X_c$ is mapped to the CLIP image space using OpenCLIP ViT-bigG/14, yielding the embedding $e_{X_c}$.
+- The fMRI representation $Y'_c$ is processed through a Multi-Layer Perceptron (MLP) to generate the embedding $e_{Y_c}$.
+
+Contrastive learning is used to align $e_{X_c}$ and $e_{Y_c}$, enhancing the semantics of $e_{Y_c}$. A bidirectional loss, called BiMixCo, is employed to improve convergence and robustness for scarce fMRI samples:
+
+```math
+L_{BiMixCo} = \text{MixCo Loss} + \text{Contrastive Loss}.
+```
+
+##### 3. Generation of Reconstruction-Embedding
+
+The CLIP ViT image space embeddings are more similar to real images than fMRI embeddings. To bridge this gap, the fMRI embedding $e_{Y_c}$ is transformed into the CLIP image embedding space to produce the reconstruction-embedding $\hat{e}_{X_c}$. Inspired by the diffusion prior in DALLE·2, this transformation involves a training loss $L_{Prior}$:
+
+```math
+\hat{e}_{X_c} = \text{Diffusion Prior}(e_{Y_c}).
+```
+
+##### 4. Reconstruction Enhancement from Text Modality
+
+Text provides higher semantic density, making it a valuable modality for improving reconstruction quality. Using BLIP-2, captions $T_c$ are generated for keyframes $X_c$. These captions are embedded to produce $e_{T_c}$. Contrastive learning is applied between $\hat{e}_{X_c}$ and $e_{T_c}$, further enhancing $\hat{e}_{X_c}$:
+
+```math
+L_{Reftm} = \text{Contrastive Loss}(\hat{e}_{X_c}, e_{T_c}).
+```
+
+#### Composite Training Loss
+
+The overall training loss $L_{SR}$ for the Semantics Reconstructor is a weighted combination of the above losses:
+
+```math
+L_{SR} = L_{BiMixCo} + \delta L_{Prior} + \mu L_{Reftm},
+```
+
+where $\delta$ and $\mu$ are mixing coefficients to balance the contributions of each loss term.
 
 ### 3. Multi-fMRI Fusion
 
