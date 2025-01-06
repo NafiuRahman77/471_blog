@@ -76,26 +76,26 @@ The Perception Reconstructor (PR) is a fundamental component of the NeuroClips f
 
 To handle the temporal resolution of fMRI, the input video is divided into several clips of two-second intervals. For each clip, denoted as $c$:
 
-- The video is downsampled, retaining frames at fixed intervals to form a set $X = [X_1, X_2, \ldots, X_{N_f}]$, where $X_i$ represents the $i$-th retained frame image, and $ N_f $ is the total number of retained frames.
-- The corresponding fMRI signal $ Y_c $ is extended into $ N_f $ frames using the **Inception Extension Module**, producing $ Y = [Y_1, Y_2, \ldots, Y_{N_f}] $.
+- The video is downsampled, retaining frames at fixed intervals to form a set $X = [X_1, X_2, \ldots, X_{N_f}]$, where $X_i$ represents the $i$-th retained frame image, and $N_f$ is the total number of retained frames.
+- The corresponding fMRI signal $Y_c$ is extended into $N_f$ frames using the **Inception Extension Module**, producing $Y = [Y_1, Y_2, \ldots, Y_{N_f}]$.
 
 ##### Embedding Generation
 
 Sequential processing is performed as follows:
-1. A simple Multi-Layer Perceptron (MLP) processes $ Y $ to generate embeddings $ E_Y = [e_{Y_1}, e_{Y_2}, \ldots, e_{Y_{N_f}}] $.
-2. The embeddings $ E_Y $ are fed into the Stable Diffusion Variational Autoencoder (VAE) decoder, producing a sequence of blurry images referred to as the "blurry video."
+1. A simple Multi-Layer Perceptron (MLP) processes $Y$ to generate embeddings $E_Y = [e_{Y_1}, e_{Y_2}, \ldots, e_{Y_{N_f}}]$.
+2. The embeddings $E_Y$ are fed into the Stable Diffusion Variational Autoencoder (VAE) decoder, producing a sequence of blurry images referred to as the "blurry video."
 
 This blurry video is designed to:
 - Lack semantic content.
 - Exhibit strong perceptual metrics such as position, shape, and scene structure.
 
-The frame set $ X $ is then used to align $ Y $ for perceptual consistency.
+The frame set $X$ is then used to align $Y$ for perceptual consistency.
 
 ##### Training Loss
 
-The PR is trained using a combination of **Mean Absolute Error (MAE) Loss** and **Contrastive Loss**, designed to align the perception embeddings $ E_X $ (from the video frames) and $ E_Y $ (from the fMRI signals).
+The PR is trained using a combination of **Mean Absolute Error (MAE) Loss** and **Contrastive Loss**, designed to align the perception embeddings $E_X$ (from the video frames) and $E_Y$ (from the fMRI signals).
 
-Mapping $ X $ to the latent space of Stable Diffusion’s VAE yields the perception embedding set $ E_X = [e_{X_1}, e_{X_2}, \ldots, e_{X_{N_f}}] $. The overall loss function for training the Perception Reconstructor is defined as:
+Mapping $X$ to the latent space of Stable Diffusion’s VAE yields the perception embedding set $E_X = [e_{X_1}, e_{X_2}, \ldots, e_{X_{N_f}}]$. The overall loss function for training the Perception Reconstructor is defined as:
 ```math
 L_{PR} = \frac{1}{N_f} \sum_{i=1}^{N_f} \lvert e_{X_i} - e_{Y_i} \rvert 
  - \frac{1}{2N_f} \sum_{j=1}^{N_f} \log \frac{\exp(\text{sim}(e_{X_j}, e_{Y_j}) / \tau)}{\sum_{k=1}^{N_f} \exp(\text{sim}(e_{X_j}, e_{Y_k}) / \tau)}
@@ -103,14 +103,14 @@ L_{PR} = \frac{1}{N_f} \sum_{i=1}^{N_f} \lvert e_{X_i} - e_{Y_i} \rvert
 ```
 
 Where:
-- $ \text{sim}(a, b) $: Similarity function between embeddings $ a $ and $ b $.
-- $ \tau $: Temperature hyper-parameter controlling the sharpness of the similarity scores.
+- $\text{sim}(a, b)$: Similarity function between embeddings $a$ and $b$.
+- $\tau$: Temperature hyper-parameter controlling the sharpness of the similarity scores.
 
 #### Temporal Upsampling
 
 To further enhance temporal consistency, the Temporal Upsampling Module incorporates spatial and temporal relationships:
-- **Spatial Modeling:** Reshapes the fMRI embedding $ E_Y $ for spatial alignment.
-- **Temporal Modeling:** Applies learnable mappings to compute temporal relationships between frames, maintaining consistency across $ N_f $ frames.
+- **Spatial Modeling:** Reshapes the fMRI embedding $E_Y$ for spatial alignment.
+- **Temporal Modeling:** Applies learnable mappings to compute temporal relationships between frames, maintaining consistency across $N_f$ frames.
 
 The output embeddings are processed with a residual connection:
 
@@ -118,7 +118,7 @@ The output embeddings are processed with a residual connection:
 E_Y = \eta \cdot E_{\text{temp}} + (1 - \eta) \cdot E'_{\text{temp}},
 \]
 
-where $ \eta $ is a learnable mixing coefficient, and $ E'_{\text{temp}} $ represents the temporally attended embeddings.
+where $\eta$ is a learnable mixing coefficient, and $E'_{\text{temp}}$ represents the temporally attended embeddings.
 
 
 ### 2. Semantics Reconstructor
