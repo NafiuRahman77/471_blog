@@ -187,7 +187,58 @@ L_{SR} = L_{BiMixCo} + \delta L_{Prior} + \mu L_{Reftm},
 
 where $\delta$ and $\mu$ are mixing coefficients to balance the contributions of each loss term.
 
-### 3. Multi-fMRI Fusion
+### 3. Inference Process
+
+The inference process in NeuroClips reconstructs high-fidelity videos from fMRI data by integrating the outputs of the Perception Reconstructor (PR), Semantics Reconstructor (SR), and text modality. These components, referred to as $\alpha$, $\beta$, and $\gamma$ guidance respectively, are used to achieve smooth, consistent, and visually accurate video reconstruction. A pre-trained Text-to-Video (T2V) diffusion model forms the backbone of this process.
+
+#### Text-to-Video Diffusion Model
+
+Pre-trained T2V diffusion models are effective at generating videos by leveraging knowledge from graphics, image, and video domains. However, their direct application to fMRI embeddings often yields unsatisfactory results because these embeddings originate primarily from text semantics. To overcome this limitation, NeuroClips enhances the diffusion process by introducing "composite semantics," derived from video, image, and text modalities, enabling controllable and coherent generation.
+
+#### $\alpha$ Guidance: Blurry Video Reconstruction
+
+The blurry video output $V_{\text{blurry}}$ from PR serves as $\alpha$ guidance. It acts as an intermediate noisy video bridging the target video $V_0$ and the noise video $V_T$. The latent space translation and reparameterization trick are applied to formalize the noise $z_T$:
+
+```math
+z_T = \sqrt{\frac{\bar{\alpha}_T}{\bar{\alpha}_{\vartheta T}}} \cdot z_{\text{blurry}} + \sqrt{1 - \frac{\bar{\alpha}_T}{\bar{\alpha}_{\vartheta T}}} \cdot \epsilon,
+```
+
+where:
+- $\bar{\alpha}_T = \prod_{t=1}^T \alpha_t$ represents the cumulative noise schedule up to step $T$.
+- $\bar{\alpha}_{\vartheta T} = \prod_{t=1}^{\vartheta T} \alpha_t$ is the reduced schedule for $\vartheta T$ steps.
+- $\epsilon \sim \mathcal{N}(0, 1)$ denotes Gaussian noise.
+
+The reverse process iteratively denoises $z_T$ back to $z_0$:
+
+```math
+z_{t-1} \sim p_\theta(z_{t-1} | z_t) = \mathcal{N}(z_{t-1}; \mu_\theta(z_t, t), \Sigma_\theta(z_t, t)),
+```
+
+where $\mu_\theta$ and $\Sigma_\theta$ are the mean and variance predicted by the diffusion model. Translating $z_0$ to pixel space yields the reconstructed video $V_0$.
+
+#### $\beta$ Guidance: Keyframe Integration
+
+$\alpha$ guidance ensures perceptual smoothness but lacks semantic specificity. To enhance fidelity, $\beta$ guidance incorporates keyframes reconstructed by SR. The process involves:
+
+1. Selecting the first frame $V_1$ of $V_{\text{blurry}}$.
+2. Inputting $V_1$'s embedding and fMRI embedding into SDXL unCLIP to reconstruct the keyframe image $X_{\text{key}}$.
+3. Using ControlNet to inject $\beta$ guidance into the T2V diffusion model. The keyframe $X_{\text{key}}$ serves as the initial frame, guiding video generation with consistent structural and semantic details.
+
+#### $\gamma$ Guidance: Text Modality Integration
+
+Text modality further refines semantic coherence. BLIP-2 generates captions $T_{\text{key}}$ for the keyframe $X_{\text{key}}$. These captions are embedded as $e_{T_{\text{key}}}$, providing $\gamma$ guidance to the diffusion model. This step ensures the alignment of visual semantics throughout the reconstructed video.
+
+#### Final Reconstruction
+
+The T2V diffusion model synthesizes the final video $V_0$ by integrating:
+- $\alpha$ guidance: Blurry rough video $V_{\text{blurry}}$.
+- $\beta$ guidance: High-quality keyframe $X_{\text{key}}$.
+- $\gamma$ guidance: Text prompt $T_{\text{key}}$.
+
+By combining these elements, NeuroClips produces videos with unmatched fidelity, smoothness, and semantic accuracy.
+
+
+### 4. Multi-fMRI Fusion
 
 Reconstructing longer videos requires linking semantically similar segments. NeuroClips introduces a fusion strategy that aligns neighboring fMRI samples based on their semantic similarity. This allows for the seamless generation of video sequences up to 6 seconds long, maintaining high fidelity and consistency.
 
