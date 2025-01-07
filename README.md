@@ -310,6 +310,9 @@ The evaluation utilized both frame-based and video-based metrics:
 
 ## Results: Pushing the Boundaries of Video Reconstruction
 
+![result](https://raw.githubusercontent.com/NafiuRahman77/471_blog/main/images/result.png)
+*Figure 3: Qualitative comparison of video reconstruction results between NeuroClips and previous SOTA methods.*
+
 NeuroClips achieves remarkable improvements over previous methods, as demonstrated on the cc2017 dataset. Here’s a detailed comparison:
 
 - **Pixel-Level Metrics:**
