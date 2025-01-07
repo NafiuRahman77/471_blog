@@ -65,8 +65,8 @@ For static image generation, diffusion models like DALLE·2 and Stable Diffusion
 Extending diffusion models to video generation involves additional challenges, particularly in maintaining temporal consistency across frames. Approaches like Animatediff introduced plug-and-play motion modules that can be integrated into existing image diffusion models, enabling them to handle dynamic content. Similarly, Stable Video Diffusion fine-tuned pre-trained image diffusion models on high-quality video datasets, achieving notable improvements in generating coherent motion sequences.
 
 ## Methods: How NeuroClips Works
-
-The NeuroClips framework is a synergy of cutting-edge techniques designed to overcome the limitations of existing fMRI-to-video reconstruction methods. Its core components are:
+![Methodology](https://raw.githubusercontent.com/NafiuRahman77/471_blog/main/images/architecture.png)
+The NeuroClips framework is a combination of techniques designed to overcome the limitations of existing fMRI-to-video reconstruction methods. Its core components are:
 
 ### Perception Reconstructor
 
@@ -153,7 +153,7 @@ Although the human brain processes information non-linearly, empirical evidence 
 For each clip $c$, a single frame $X_c$ is randomly selected as the keyframe. The following steps are performed:
 
 - The keyframe $X_c$ is mapped to the CLIP image space using OpenCLIP ViT-bigG/14, yielding the embedding $e_{X_c}$.
-- The fMRI representation \( Y'_c \) is processed through a Multi-Layer Perceptron (MLP) to generate the embedding 
+- The fMRI representation $Y'_c$ is processed through a Multi-Layer Perceptron (MLP) to generate the embedding 
 $e_{Y_c}$.
 
 Contrastive learning is used to align $e_{X_c}$ and $e_{Y_c}$, enhancing the semantics of $e_{Y_c}$. A bidirectional loss, called BiMixCo, is employed to improve convergence and robustness for scarce fMRI samples:
@@ -241,7 +241,69 @@ By combining these elements, NeuroClips produces videos with unmatched fidelity,
 
 ### 4. Multi-fMRI Fusion
 
-Reconstructing longer videos requires linking semantically similar segments. NeuroClips introduces a fusion strategy that aligns neighboring fMRI samples based on their semantic similarity. This allows for the seamless generation of video sequences up to 6 seconds long, maintaining high fidelity and consistency.
+#### Long Video Reconstruction
+
+Generating videos longer than the temporal resolution of fMRI (typically 2 seconds) presents a significant challenge. Previous methods treated each single-frame fMRI sample independently, computing temporal attention only at this level. This approach limited the generation of coherent video sequences to durations of less than 2 seconds. NeuroClips introduces a novel strategy for extending video reconstruction duration while maintaining coherence and semantic consistency.
+
+#### Challenges in Long Video Generation
+
+Current video generative models rely on:
+1. **Diffusion-based image generation models:** These models refine noisy inputs iteratively but face scalability issues as the number of frames increases.
+2. **Attention-based transformer architectures:** Although powerful, these architectures incur substantial computational overhead, making the generation of long and complex videos inefficient.
+
+As content scales linearly with the number of frames, computational costs grow rapidly, creating bottlenecks for generating videos longer than the temporal resolution of fMRI.
+
+#### NeuroClips’ Fusion Strategy
+
+To address these challenges, NeuroClips employs a straightforward fusion strategy that:
+- Avoids additional GPU training.
+- Leverages semantic similarity between neighboring frames to maintain coherence.
+
+#### Key Steps in the Fusion Strategy
+
+1. **Semantic Similarity Measurement:**
+   - For two neighboring fMRI samples, the reconstructed keyframes are analyzed.
+   - CLIP representations of the keyframes are obtained to capture their semantic content.
+   - A shallow Multi-Layer Perceptron (MLP) is trained to classify whether the two keyframes share the same semantic class (e.g., both representing jellyfish).
+
+2. **Keyframe Replacement:**
+   - If the neighboring keyframes are deemed semantically similar, the keyframe of the latter fMRI sample is replaced with the tail frame of the video reconstructed from the former fMRI sample.
+   - The tail frame then serves as the first frame for the subsequent video reconstruction, ensuring continuity across segments.
+
+Using this fusion strategy, NeuroClips successfully reconstructs continuous video sequences of up to 6 seconds—marking the first achievement of this duration in fMRI-to-video reconstruction. The resulting videos maintain:
+- **Temporal coherence:** Smooth transitions between segments.
+- **Semantic consistency:** Logical flow of visual content across frames.
+
+## Dataset, Implementation and Evaluation
+
+### Dataset
+The experiments in this study utilized the open-source [cc2017 fMRI-video dataset](https://purr.purdue.edu/publications/2809/1). This dataset includes:
+- **Training Set:** 18 8-minute video clips, presented twice per subject, resulting in 8640 fMRI-video pairs.
+- **Testing Set:** 5 8-minute video clips, presented 10 times per subject, averaged across trials for consistency, resulting in 1200 fMRI-video pairs.
+
+fMRI data were collected using a 3-T MRI system, with a temporal resolution of 2 seconds. Significant preprocessing steps included:
+- **Artifact Removal and Motion Correction:** Six degrees of freedom applied.
+- **Spatial Registration:** Data aligned to MNI space and cortical surface templates.
+- **Voxel Selection:** Stimulus-activated voxels identified using Fisher z-transformation and one-sample t-tests.
+
+### Implementation Details
+- Videos were downsampled from 30FPS to 3FPS for training and testing.
+- Blurry videos were interpolated to 8FPS for final reconstruction.
+- A shallow MLP implemented the inception extension in PR.
+- The open-source AnimateDiff model served as the base T2V diffusion model.
+- Experiments were conducted on a single A100 GPU with 25 DDIM steps and  $\vartheta = 0.3$ for $\alpha$ guidance.
+
+### Evaluation Metrics
+The evaluation utilized both frame-based and video-based metrics:
+
+1. **Frame-based Metrics:**
+   - **Pixel-Level:** Structural Similarity Index Measure (SSIM) and Peak Signal-to-Noise Ratio (PSNR).
+   - **Semantic-Level:** N-way top-K accuracy test using ImageNet classes. A trial is successful if the ground truth (GT) class is among the top-K predictions for a given frame.
+
+2. **Video-based Metrics:**
+   - **Semantic-Level:** Classification accuracy on Kinetics-400 video classes using a VideoMAE-based classifier.
+   - **Spatiotemporal-Level:** Consistency measured by average cosine similarity of CLIP embeddings between adjacent frames (CLIP-pcc).
+
 
 ## Results: Pushing the Boundaries of Video Reconstruction
 
@@ -257,9 +319,31 @@ NeuroClips achieves remarkable improvements over previous methods, as demonstrat
 - **Spatiotemporal Metrics:**
   - An 81% improvement in spatiotemporal consistency metrics underscores NeuroClips’ ability to produce smoother transitions and coherent motion sequences.
 
-### Visual Comparisons
+## Ablation Studies and Interpretation
+### Ablation Studies
 
-Figure 1 in the original paper vividly demonstrates the superiority of NeuroClips over previous state-of-the-art methods. While earlier models often fail to maintain semantic consistency across frames, NeuroClips reconstructs sequences that are not only more accurate but also visually appealing.
+A detailed ablation study was conducted to assess the impact of three critical components of NeuroClips: keyframes, blurry videos, and keyframe captioning. The experiments reveal the interplay between semantic and perception reconstruction, highlighting trade-offs and the contributions of individual modules.
+
+**Keyframes:**
+Keyframes significantly enhance semantic reconstruction. When keyframes are removed, the model exhibits higher pixel-level metrics but suffers in semantic-level performance. This indicates that keyframes are essential for maintaining semantic coherence across reconstructed videos.
+
+**Blurry Videos:**
+Blurry videos contribute to smoother transitions and better temporal consistency. Without them, semantic-level metrics improve slightly, but spatiotemporal consistency deteriorates, emphasizing their role in perceptual reconstruction.
+
+**Keyframe Captioning:**
+Comparing two captioning approaches—GIT and BLIP-2—revealed the flexibility of keyframe-based captioning. GIT’s captions often lacked diversity (e.g., repetitive phrases like “a large body of water”), degrading semantic reconstruction. BLIP-2, by contrast, provided richer, contextually relevant captions that significantly improved video quality. Removing captions altogether led to poor semantic control, as the model relied solely on generic prompts like “a smooth video.”
+
+These findings underscore the complementary nature of perception and semantic reconstruction modules in NeuroClips. The full model achieves the best spatiotemporal consistency by integrating all components effectively.
+
+### Interpretation Results: Neural Attention and Visual Cortex Insights:
+To better understand the neural interpretability of NeuroClips, voxel-level weights were visualized on a brain flat map:
+
+**Visual Cortex Dominance:**
+- The visual cortex plays a pivotal role in both perceptual and semantic reconstruction tasks, with distinct areas contributing differently:
+Higher Visual Cortex: Distributed weight patterns indicate its involvement in semantic-level processing, correlating with the model’s ability to capture complex visual concepts.
+- **Lower Visual Cortex:** Concentrated weights correspond to low-level perceptual tasks like motion and spatial arrangement, aligning with NeuroClips' perceptual reconstruction capabilities.
+
+These visualizations provide insight into how NeuroClips maps fMRI data to reconstructed videos, reinforcing its biological plausibility and the significance of incorporating neural mechanisms into generative models.
 
 ## Insights and Applications
 
