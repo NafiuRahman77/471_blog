@@ -166,7 +166,7 @@ L_{BiMixCo} = \text{MixCo Loss} + \text{Contrastive Loss}.
 
 ##### 3. Generation of Reconstruction-Embedding
 
-The CLIP ViT image space embeddings are more similar to real images than fMRI embeddings. To bridge this gap, the fMRI embedding $e_{Y_c}$ is transformed into the CLIP image embedding space to produce the reconstruction-embedding $\hat{e}_{X_c}$. Inspired by the diffusion prior in DALLE·2, this transformation involves a training loss $L_{Prior}$:
+The CLIP ViT image space embeddings are more similar to real images than fMRI embeddings. To bridge this gap, the fMRI embedding $e_{Y_c}$ is transformed into the CLIP image embedding space to produce the reconstruction-embedding $\hat{e}\_{X\_c}$. Inspired by the diffusion prior in DALLE·2, this transformation involves a training loss $L\_{Prior}$:
 
 ```math
 \hat{e}_{X_c} = \text{Diffusion Prior}(e_{Y_c}).
