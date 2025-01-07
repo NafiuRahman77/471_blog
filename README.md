@@ -308,22 +308,51 @@ The evaluation utilized both frame-based and video-based metrics:
    - **Spatiotemporal-Level:** Consistency measured by average cosine similarity of CLIP embeddings between adjacent frames (CLIP-pcc).
 
 
-## Results: Pushing the Boundaries of Video Reconstruction
+## Results
 
 ![result](https://raw.githubusercontent.com/NafiuRahman77/471_blog/main/images/result.png)
-*Figure 3: Qualitative comparison of video reconstruction results between NeuroClips and previous SOTA methods.*
+*Figure 3: Qualitative comparison of video reconstruction results between NeuroClips and previous SOTA methods. On the left are the results of the comparison with previous studies, and on the right are additional comparisons with previous SOTA methods. Best viewed with zoom-in. As shown in the leftmost figure group, Mind-Video’s reconstruction fails to go for detail consistency on the character’s face, but our NeuroClips achieves an extremely high consistency*
 
-NeuroClips achieves remarkable improvements over previous methods, as demonstrated on the cc2017 dataset. Here’s a detailed comparison:
+# Table: Quantitative Comparison of NeuroClips Performance
 
-- **Pixel-Level Metrics:**
-  - A 128% increase in SSIM highlights NeuroClips’ superior ability to preserve structural details.
-  - Enhanced PSNR values confirm improved image quality in reconstructed frames.
+| **Method**          | **Video-based (Semantic-level)** |          |          | **ST-level**  | **Frame-based (Semantic-level)** |          | **Pixel-level**     |          |
+|----------------------|-----------------------------------|----------|----------|---------------|-----------------------------------|----------|---------------------|----------|
+|                      | 2-way ↑                          | 50-way ↑ | CLIP-pcc ↑ | 2-way ↑       | 50-way ↑                          | SSIM ↑   | PSNR ↑             |          |
+| **Nishimoto [3]**    | -                                | -        | -        | 0.727 ± 0.04  | -                                | 0.116 ± 0.09 | 8.012 ± 2.31       |          |
+| **Wen [31]**         | -                                | 0.166 ± 0.02 | -    | 0.758 ± 0.03  | 0.070 ± 0.01                    | 0.114 ± 0.15 | 7.646 ± 3.48       |          |
+| **Wang [32]**        | 0.773 ± 0.03                     | -        | 0.402 ± 0.41 | 0.713 ± 0.04 | -                                | 0.118 ± 0.08 | **11.432 ± 2.42** |          |
+| **Kupershmidt [33]** | 0.771 ± 0.03                     | -        | 0.386 ± 0.47 | 0.764 ± 0.03 | 0.179 ± 0.02                    | 0.135 ± 0.08 | 8.761 ± 2.22       |          |
+| **MinD-Video [8]**   | **0.839 ± 0.03**                 | 0.197 ± 0.02 | 0.408 ± 0.46 | 0.796 ± 0.03 | 0.174 ± 0.03                    | 0.171 ± 0.08 | 8.662 ± 1.52       |          |
+| **NeuroClips**       | 0.834 ± 0.03                     | **0.220 ± 0.01** | **0.738 ± 0.17** | **0.806 ± 0.03** | **0.203 ± 0.01** | **0.390 ± 0.08** | _9.211 ± 1.46_  |
+| **Subject 1**        | 0.830 ± 0.03                     | 0.208 ± 0.01 | 0.736 ± 0.12 | 0.799 ± 0.03 | 0.187 ± 0.01                    | **0.392 ± 0.08** | **9.226 ± 1.42** |
+| **Subject 2**        | _0.837 ± 0.03_                   | _0.230 ± 0.01_ | _0.742 ± 0.19_ | _0.811 ± 0.03_ | _0.210 ± 0.01_                  | **0.392 ± 0.08** | **9.336 ± 1.52** |
+| **Subject 3**        | 0.835 ± 0.03                     | 0.221 ± 0.01 | 0.735 ± 0.20 | 0.807 ± 0.03 | 0.213 ± 0.01                    | 0.387 ± 0.09 | 9.072 ± 1.44       |
 
-- **Semantic-Level Metrics:**
-  - NeuroClips achieves higher classification accuracy for reconstructed frames and videos, reflecting better semantic alignment.
+**Notes**:  
+- **Bold font** indicates the best performance.  
+- _Italicized text_ indicates the second-best performance.
 
-- **Spatiotemporal Metrics:**
-  - An 81% improvement in spatiotemporal consistency metrics underscores NeuroClips’ ability to produce smoother transitions and coherent motion sequences.
+
+**Pixel-Level Metrics**
+- NeuroClips achieves a **128% improvement in SSIM**, showcasing its superior structural detail preservation. 
+- Higher **PSNR values** confirm the enhanced quality of reconstructed frames. 
+- Thanks to the **Perception Reconstructor (α Guidance)**, NeuroClips excels in pixel-level reconstruction, accurately capturing the shapes and motion trajectories of objects like the moon, albeit with slight semantic shifts.
+
+**Semantic-Level Metrics**
+- NeuroClips significantly outperforms previous methods in semantic alignment, achieving:
+  - **Higher classification accuracy** for reconstructed frames and videos.
+  - Clearer and more precise semantics, such as people, turtles, and airplanes, when compared to MinD-Video.
+
+**Spatiotemporal Metrics**
+- NeuroClips demonstrates an **81% improvement in spatiotemporal consistency**, producing:
+  - Smoother transitions between frames.
+  - Coherent motion sequences across reconstructed videos.
+- The **Blurry Rough-Video (α Guidance)** ensures initial smoothness for video reconstruction, overcoming limitations seen in methods like MinD-Video, where human deformations and scene switches within an fMRI frame are excessive.
+
+**Extended Video Generation**
+- With **Keyframes for First-Frame Guidance (β Guidance)** and blurry videos, NeuroClips can generate longer videos by connecting semantically similar sequences. 
+- This slightly impacts **2-way metrics** but enhances the similarity of neighboring reconstructed videos.
+
 
 ## Ablation Studies and Interpretation
 ### Ablation Studies
