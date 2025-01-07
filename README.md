@@ -174,7 +174,7 @@ The CLIP ViT image space embeddings are more similar to real images than fMRI em
 
 ##### 4. Reconstruction Enhancement from Text Modality
 
-Text provides higher semantic density, making it a valuable modality for improving reconstruction quality. Using BLIP-2, captions $T_c$ are generated for keyframes $X_c$. These captions are embedded to produce $e_{T_c}$. Contrastive learning is applied between $\hat{e}_{X_c}$ and $e_{T_c}$, further enhancing $\hat{e}_{X_c}$:
+Text provides higher semantic density, making it a valuable modality for improving reconstruction quality. Using BLIP-2, captions $T_c$ are generated for keyframes $X_c$. These captions are embedded to produce $e_{T_c}$. Contrastive learning is applied between $\hat{e}_{X_c}$ and $e_{T_c}$, further enhancing $\hat{e}_{X_c}$ :
 
 ```math
 L_{Reftm} = \text{Contrastive Loss}(\hat{e}_{X_c}, e_{T_c}).
