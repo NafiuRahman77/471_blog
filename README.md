@@ -395,7 +395,7 @@ The advancements showcased by NeuroClips open up a plethora of applications:
 Despite its achievements, NeuroClips faces several challenges:
 1. **Computational Demand:** The reliance on high-performance GPUs makes real-time applications currently unfeasible.
 2. **Limited Training Data:** fMRI datasets are relatively scarce, and the model may struggle with generalization to unseen video types.
-3. **Cross-Scene Reconstruction:** NeuroClips struggles to seamlessly reconstruct scenes with significant visual transitions.
+3. **Cross-Scene Reconstruction:** NeuroClips struggles to reconstruct scenes with significant visual transitions.
 
 ## Future Directions
 
