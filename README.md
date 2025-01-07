@@ -66,6 +66,8 @@ Extending diffusion models to video generation involves additional challenges, p
 
 ## Methods: How NeuroClips Works
 ![Methodology](https://raw.githubusercontent.com/NafiuRahman77/471_blog/main/images/architecture.png)
+*Figure 1: The overall framework of NeuroClips. The red lines represent the infernence process.*
+
 The NeuroClips framework is a combination of techniques designed to overcome the limitations of existing fMRI-to-video reconstruction methods. Its core components are:
 
 ### Perception Reconstructor
@@ -240,7 +242,8 @@ By combining these elements, NeuroClips produces videos with unmatched fidelity,
 
 
 ### 4. Multi-fMRI Fusion
-
+![fusion](https://raw.githubusercontent.com/NafiuRahman77/471_blog/main/images/fusion.png)
+*Figure 2: Visualization of Multi-fMRI fusion. With the semantic relevance measure, we can generate video clips up to 6s long without any additional training.*
 #### Long Video Reconstruction
 
 Generating videos longer than the temporal resolution of fMRI (typically 2 seconds) presents a significant challenge. Previous methods treated each single-frame fMRI sample independently, computing temporal attention only at this level. This approach limited the generation of coherent video sequences to durations of less than 2 seconds. NeuroClips introduces a novel strategy for extending video reconstruction duration while maintaining coherence and semantic consistency.
