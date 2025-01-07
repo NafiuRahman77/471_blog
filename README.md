@@ -168,7 +168,7 @@ Although the human brain processes information non-linearly, empirical evidence 
 For each clip $c$, a single frame $X_c$ is randomly selected as the keyframe. The following steps are performed:
 
 - The keyframe $X_c$ is mapped to the CLIP image space using OpenCLIP ViT-bigG/14, yielding the embedding $e_{X_c}$.
-- The fMRI representation $Y'_c$ is processed through a Multi-Layer Perceptron (MLP) to generate the embedding 
+- The fMRI representation $Y'\_c$ is processed through a Multi-Layer Perceptron (MLP) to generate the embedding 
 $e_{Y_c}$.
 
 Contrastive learning is used to align $e_{X_c}$ and $e_{Y_c}$, enhancing the semantics of $e_{Y_c}$. A bidirectional loss, called BiMixCo, is employed to improve convergence and robustness for scarce fMRI samples:
