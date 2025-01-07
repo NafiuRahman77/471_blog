@@ -1,8 +1,21 @@
 ---
 title: "Decoding Minds to Movies: An Overview of NeuroClips from NeurIPS 2024"
-author: "[Your Name]"
-date: "2025-01-06"
+authors: 
+  - Zixuan Gong
+  - Guangyin Bao
+  - Qi Zhang
+  - Zhongwei Wan
+  - Duoqian Miao
+  - Shoujin Wang
+  - Lei Zhu
+  - Changwei Wang
+  - Rongtao Xu
+  - Liang Hu
+  - Ke Liu
+  - Yu Zhang
+date: "2025-01-07"
 ---
+
 
 ## Introduction
 
