@@ -207,8 +207,8 @@ z_T = \sqrt{\frac{\bar{\alpha}_T}{\bar{\alpha}_{\vartheta T}}} \cdot z_{\text{bl
 ```
 
 where:
-- $\bar{\alpha}_T = \prod_{t=1}^T \alpha_t$ represents the cumulative noise schedule up to step $T$.
-- $\bar{\alpha}_{\vartheta T} = \prod_{t=1}^{\vartheta T} \alpha_t$ is the reduced schedule for $\vartheta T$ steps.
+- $\bar{\alpha}\_T = \prod\_{t=1}^T \alpha\_t$ represents the cumulative noise schedule up to step $T$.
+- $\bar{\alpha}\_{\vartheta T} = \prod\_{t=1}^{\vartheta T} \alpha\_t$ is the reduced schedule for $\vartheta T$ steps.
 - $\epsilon \sim \mathcal{N}(0, 1)$ denotes Gaussian noise.
 
 The reverse process iteratively denoises $z_T$ back to $z_0$:
