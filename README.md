@@ -1,19 +1,6 @@
----
-title: "Decoding Minds to Movies: An Overview of NeuroClips from NeurIPS 2024"
-authors: 
-  - Zixuan Gong
-  - Guangyin Bao
-  - Qi Zhang
-  - Zhongwei Wan
-  - Duoqian Miao
-  - Shoujin Wang
-  - Lei Zhu
-  - Changwei Wang
-  - Rongtao Xu
-  - Liang Hu
-  - Ke Liu
-  - Yu Zhang
-date: "2025-01-07"
+# NeuroClips: Bridging Minds and Movies with High-Fidelity Video Reconstruction from Brain Signals
+
+> *This blog is a review of the paper ["NeuroClips: Towards High-fidelity and Smooth fMRI-to-Video Reconstruction"](https://openreview.net/forum?id=8qu52Fl1Dt), published at NeurIPS 2024. The blog is co-authored by [Md Nafiu Rahman](https://github.com/NafiuRahman77), [Wasif Jalal](https://github.com/wjalal), and [Shahriar Raj](https://github.com/shahriar-raj), all undergraduate seniors at CSE, BUET.*
 ---
 
 
